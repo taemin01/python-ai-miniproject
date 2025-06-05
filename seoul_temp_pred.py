@@ -16,6 +16,7 @@ from keras.models import Sequential
 from keras.layers import Dense, LSTM, SimpleRNN
 import keras.losses as losses
 import matplotlib.pyplot as plt
+from tensorflow.keras.optimizers import Adam
 
 # 1. 데이터셋 열기
 file_name = 'seoul_weather(2018.01.01~2024.01.01).csv'
@@ -70,14 +71,14 @@ model = Sequential()
 model.add(SimpleRNN(64,activation='tanh', input_shape=(X_train.shape[1], 1)))
 model.add(Dense(1))
 
-model.compile(optimizer='adam', loss='mse')  # MSE(평균제곱오차) 사용
+model.compile(optimizer='adam', loss='mse') # MSE(평균제곱오차) 사용
 
 model.summary()
 
 model.fit(
     X_train, y_train,
-    epochs=100,              # epoch 수
-    batch_size=16,           # 배치 크기
+    epochs=300,
+    batch_size=32,
     validation_data=(X_val, y_val))  # 검증 데이터
 
 # 테스트 데이터 예측
