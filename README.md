@@ -64,6 +64,9 @@ test_data = scaled[train_size + val_size:]          # 테스트 데이터
 ## **하이퍼 파라미터 최적화 결과**
 RNN, LSTM 모델의 하이퍼 파라미터 조합을 테스트한 RMSE 결과입니다.  
 
+일반적으로 LSTM이 장기 시퀀스에 유리하지만, 본 데이터셋은 하루 단위 평균 기온의  
+연속성(자기상관성)이 강하지 않거나, 데이터 양이 충분하지 않아 간단한 RNN이 더 좋은 성능을 보입니다.
+
 다른 파라미터 테스트에 비해 비교적 성능 높은 것들로 구성하였습니다.
 
 | RNN | units | activation |  epochs | batch_size | RMSE           |
