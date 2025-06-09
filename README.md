@@ -4,10 +4,13 @@
 - Google Colab
 
 ## **문제 정의**
-- **문제 유형** : 정형 데이터 기반 회귀 문제
+- **문제 유형** : 정형 데이터 기반 시계열 회귀 문제
 - **목표** : 서울시 기상 데이터의 **과거 7일치 평균 기온** 데이터를 기반으로 **다음날 평균 기온 예측**
 - **입력 변수(속성)** : 과거 7일치 평균 기온(temp)
 - **출력 변수** : 다음날 평균 기온(temp) 예측값
+
+## **참고 코드**
+- 13주차 코드 big14_stock_assign_nofill_2025.ipynb
 
 
 ## **데이터 설명**
@@ -18,13 +21,17 @@
 - **데이터 개수** : 2018.01.01 ~ 2024.01.01 (총 **2,194개**)
 - **사용 속성** : 평균 기온(temp) 1개  
 - **데이터 분할 비율** : 전체 80%를 학습 및 검증 데이터로 사용하며, 그 중 20%를 검증 데이터로 분할합니다.  
-최종적으로 학습 데이터 64%, 검증 데이터 16%, 테스트 데이터 20% 비율이 되도록 하였습니다.
+최종적으로 학습:검증:테스트 = 64:16:20 비율이 되도록 하였습니다.
 - **데이터 분할 결과**
   - training : 64% (**1,404개**)
   - val      : 16% (**351개**)
   - test     : 20% (**439개**)
     
 ## **전처리 과정**
+평균 기온 데이터를 0~1 범위로 정규화한 후,  
+7일치 데이터를 슬라이딩 윈도우 방식으로 묶어  
+과거 7일의 평균 기온을 입력값 X로, 다음날의 평균 기온을 y로  
+설정하여 모델 학습용 시계열 데이터를 구성하였습니다.
 ```python
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -42,6 +49,21 @@ df['datetime'] = pd.to_datetime(df['datetime'])
 #평균 온도 데이터를 MinMaxScaler를 사용하여 0~1 범위로 정규화(스케일링)
 scaler = MinMaxScaler(feature_range = (0, 1))
 scaled = scaler.fit_transform(temperature)
+
+def create_sequences(data, time_steps):
+    X, y = [], []
+    for i in range(len(data) - time_steps):
+        X.append(data[i:i + time_steps])     # time_steps(7일치) 데이터
+        y.append(data[i + time_steps])       # 다음날 데이터
+    return np.array(X), np.array(y)
+
+# 시퀀스 길이 설정
+time_steps = 7
+
+# train/val/test 데이터를 시퀀스 데이터로 변환
+X_train, y_train = create_sequences(train_data, time_steps)
+X_val, y_val     = create_sequences(val_data, time_steps)
+X_test, y_test   = create_sequences(test_data, time_steps)
 ```
 
 
